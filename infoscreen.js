@@ -32,7 +32,7 @@ async function callAndExtract()
         const result = await Runtime.evaluate({
             expression: '$("div.einsatz.aktiv").length > 0'
         });
-        console.log(result);
+        console.log("checked");
         if(result.result.value){
             //we are in an emergency!
             if(emergency === 0)
