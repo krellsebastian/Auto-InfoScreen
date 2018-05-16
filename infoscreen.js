@@ -1,22 +1,7 @@
-const chromeLauncher = require('chrome-launcher');
-const CDP = require('chrome-remote-interface');
-
 var DEBUG_STDIN = false;
 
-let cec  = null;
-
-console.log("start cec");
-try{
-    nodecec = require( 'node-cec' );
-    NodeCec = nodecec.NodeCec;
-    CEC     = nodecec.CEC;
-    cec = new NodeCec( 'node-cec-monitor' );
-    console.log("cec init success");
-}catch (err) {
-    console.log(`ERROR: No CEC`);
-}
-console.log("cec init done");
-
+const chromeLauncher = require('chrome-launcher');
+const CDP = require('chrome-remote-interface');
 let chromeInstance;
 let chromeClient;
 let emergency = 0;
@@ -25,7 +10,7 @@ console.log("chrome_launch");
 chromeLauncher.launch({
     startingUrl: 'https://infoscreen.florian10.info/ows/infoscreen/v3',
     userDataDir: false,
-    chromeFlags: ['--disable-infobars', '--disable-session-crashed-bubble', '--kiosk']
+    chromeFlags: ['--disable-infobars', '--disable-background-networking', '--disable-extensions', '--kiosk']
 }).then(chrome => {
     console.log(`Chrome debugging port running on ${chrome.port}`);
     chromeInstance = chrome;
@@ -82,44 +67,32 @@ async function callAndExtract()
     }
 }
 
-console.log("cec_start");
+
+let cec  = null;
+
+console.log("start cec");
 try{
-    cec.start( 'cec-client', '-b', 'r', '-o', 'FF Infoscreen' );
-}catch (e) {
-    console.log("cec not started");
+    nodecec = require( 'node-cec' );
+    NodeCec = nodecec.NodeCec;
+    CEC     = nodecec.CEC;
+    cec = new NodeCec( 'node-cec-monitor' );
+
+    console.log("cec init success");
+    try{
+        cec.start( 'cec-client', '-b', 'r', '-o', 'FF Infoscreen' );
+    }catch (e) {
+        console.log("cec not started");
+    }
+    console.log("cec start done");
+}catch (err) {
+    console.log(`ERROR: No CEC`);
 }
+
 cec.once( 'ready', function(client) {
   console.log( ' -- CEC READY -- ' );
   client.sendCommand( 0xf0, CEC.Opcode.GIVE_DEVICE_POWER_STATUS );
 });
 
-console.log("cec_start_done");
-
-
-//--------------------KEEP ALIVE
-
-var http = require("http");
-
-var alive_options = {
-  host: 'www.skrell.at',
-  port: 80,
-  path: '/robot/ff_state.php?alive=true'
-};
-
-setInterval(sendAliveSignal,5*60*1000);	//5 minutes
-sendAliveSignal();
-
-function sendAliveSignal(){
-	http.get(alive_options, function(res) {
-	  console.log("Got response: " + res.statusCode);
-	
-	  for(var item in res.headers) {
-	    console.log(item + ": " + res.headers[item]);
-	  }
-	}).on('error', function(e) {
-	  console.log("Got error: " + e.message);
-	});
-}
 
 //-----------------------DEBUG
 
