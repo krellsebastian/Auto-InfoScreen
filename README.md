@@ -41,7 +41,7 @@ Im Startup-Script von LXDE (~/.config/lxsession/LXDE/autostart) folgendes angebe
 
 ``@xdotool mousemove 9000 9000``
 ``@sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/'Local State'``
-``@sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferencesroot``
+``@sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferences``
 
 __ACHTUNG__: Dann gibts kein Panel und keinen Desktop mehr, die Befehle dafür würden in `/etc/xdg/lxsession/<profile>/autostart` stehen, werden aber durch die lokale autostart nicht mehr ausgeführt.
 
