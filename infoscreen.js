@@ -1,19 +1,21 @@
 const chromeLauncher = require('chrome-launcher');
 const CDP = require('chrome-remote-interface');
 
+var DEBUG_STDIN = false;
 
 let cec  = null;
 
-console.log("start try");
+console.log("start cec");
 try{
-    let nodecec = require( 'node-cec' );
-    let NodeCec = nodecec.NodeCec;
-    let CEC     = nodecec.CEC;
+    nodecec = require( 'node-cec' );
+    NodeCec = nodecec.NodeCec;
+    CEC     = nodecec.CEC;
     cec = new NodeCec( 'node-cec-monitor' );
+    console.log("cec init success");
 }catch (err) {
     console.log(`ERROR: No CEC`);
 }
-console.log("end try");
+console.log("cec init done");
 
 let chromeInstance;
 let chromeClient;
@@ -22,8 +24,8 @@ let emergency = 0;
 console.log("chrome_launch");
 chromeLauncher.launch({
     startingUrl: 'https://infoscreen.florian10.info/ows/infoscreen/v3',
-    userDataDir: false//,
-    //chromeFlags: ['--kiosk', '--disable-infobars']
+    userDataDir: false,
+    chromeFlags: ['--disable-infobars', '--disable-session-crashed-bubble', '--kiosk']
 }).then(chrome => {
     console.log(`Chrome debugging port running on ${chrome.port}`);
     chromeInstance = chrome;
@@ -62,6 +64,7 @@ async function callAndExtract()
                     }
                 }catch (e) {
                     console.log("cec-error");
+                    console.log(e);
                 }
             }
             emergency = 1;
@@ -81,55 +84,89 @@ async function callAndExtract()
 
 console.log("cec_start");
 try{
-    cec.start( 'cec-client', '-m', '-d', '8', '-b', 'r' );
+    cec.start( 'cec-client', '-b', 'r', '-o', 'FF Infoscreen' );
 }catch (e) {
     console.log("cec not started");
 }
+cec.once( 'ready', function(client) {
+  console.log( ' -- CEC READY -- ' );
+  client.sendCommand( 0xf0, CEC.Opcode.GIVE_DEVICE_POWER_STATUS );
+});
+
 console.log("cec_start_done");
+
+
+//--------------------KEEP ALIVE
+
+var http = require("http");
+
+var alive_options = {
+  host: 'www.skrell.at',
+  port: 80,
+  path: '/robot/ff_state.php?alive=true'
+};
+
+setInterval(sendAliveSignal,5*60*1000);	//5 minutes
+sendAliveSignal();
+
+function sendAliveSignal(){
+	http.get(alive_options, function(res) {
+	  console.log("Got response: " + res.statusCode);
+	
+	  for(var item in res.headers) {
+	    console.log(item + ": " + res.headers[item]);
+	  }
+	}).on('error', function(e) {
+	  console.log("Got error: " + e.message);
+	});
+}
 
 //-----------------------DEBUG
 
-var stdin = process.stdin;
+if(DEBUG_STDIN == true){
 
-// without this, we would only get streams once enter is pressed
-stdin.setRawMode( true );
-
-// resume stdin in the parent process (node app won't quit all by itself
-// unless an error or process.exit() happens)
-stdin.resume();
-
-// i don't want binary, do you?
-stdin.setEncoding( 'utf8' );
-
-// on any data into stdin
-stdin.on( 'data', function( key ){
-    // write the key to stdout all normal like
-    if ( key === '\u0003' ) {
-        if ( cec != null ) {
-            cec.stop();
-        }
-        if ( chromeClient != null ) {
-            chromeClient.close();
-        }
-        if ( chromeInstance != null ) {
-            chromeInstance.kill();
-        }
-        process.exit();
-    }
-    if (key === 'k')
-    {
-        const {Runtime} = chromeClient;
-        try {
-            Runtime.evaluate({
-                expression: 'Infoscreen.Manager.cycle._onSuccess({"CurrentState":"data","EinsatzData":[{"EinsatzID":"KS 0815","Status":2,"Alarmstufe":"T1","Meldebild":"Fahrzeugbergung","Nummer1":"15","Plz":"3500","Strasse":"Kremstalstraße","Ort":"Krems","Abschnitt":"BasisAbschnitt","Bemerkung":"","EinsatzErzeugt":"2018-05-07T14:23:39.0215599+02:00","Melder":"Franz Müller","MelderTelefon":"06641234567","EinsatzNummer":1,"Dispositionen":[{"Name":"KS-Krems Hauptwache Schleife 3","IsEigenalarmiert":true,"DispoTime":"2012-05-10T08:55:00","AusTime":"2012-05-10T08:58:00","EinTime":"2012-05-10T09:30:00","IsBackground":false}],"Rsvp":{"Yes":14,"No":4}}]},"")'
-            });
-            console.log("OK key");
-        }catch (e) {
-            console.log("error on key");
-        }
-    }
-    process.stdout.write( key );
-});
+	var stdin = process.stdin;
+	
+	// without this, we would only get streams once enter is pressed
+	stdin.setRawMode( true );
+	
+	// resume stdin in the parent process (node app won't quit all by itself
+	// unless an error or process.exit() happens)
+	stdin.resume();
+	
+	// i don't want binary, do you?
+	stdin.setEncoding( 'utf8' );
+	
+	// on any data into stdin
+	stdin.on( 'data', function( key ){
+	    // write the key to stdout all normal like
+	    if ( key === '\u0003' ) {
+	        if ( cec != null ) {
+	            cec.stop();
+	        }
+	        if ( chromeClient != null ) {
+	            chromeClient.close();
+	        }
+	        if ( chromeInstance != null ) {
+	            chromeInstance.kill();
+	        }
+	        process.exit();
+	    }
+	    if (key === 'k')
+	    {
+	        const {Runtime} = chromeClient;
+	        try {
+	            Runtime.evaluate({
+	                expression: 'Infoscreen.Manager.cycle._onSuccess({"CurrentState":"data","EinsatzData":[{"EinsatzID":"KS 0815","Status":2,"Alarmstufe":"T1","Meldebild":"Fahrzeugbergung","Nummer1":"15","Plz":"3500","Strasse":"Kremstalstraße","Ort":"Krems","Abschnitt":"BasisAbschnitt","Bemerkung":"","EinsatzErzeugt":"2018-05-07T14:23:39.0215599+02:00","Melder":"Franz Müller","MelderTelefon":"06641234567","EinsatzNummer":1,"Dispositionen":[{"Name":"KS-Krems Hauptwache Schleife 3","IsEigenalarmiert":true,"DispoTime":"2012-05-10T08:55:00","AusTime":"2012-05-10T08:58:00","EinTime":"2012-05-10T09:30:00","IsBackground":false}],"Rsvp":{"Yes":14,"No":4}}]},"")'
+	            });
+	            console.log("OK key");
+	        }catch (e) {
+	            console.log("error on key");
+	        }
+	    }
+	    process.stdout.write( key );
+	});
+}
 
 process.on('uncaughtException', function(err) {
     console.log('Caught exception: ' + err);
