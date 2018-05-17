@@ -18,15 +18,14 @@ Besonders für Feuerwehrhäuser geeignet, welche nicht die ganze Zeit den Bildsc
 Workarounds OS-spezifisch. Für Linux siehe Install Guide weiter unten.
 
 ## Testen
-Im Script gibt es den Parameter __DEBUG_STDIN__. Wenn auf _true_ kann man in der Konsole (stdin) mit dem Key "K" einen Einsatz simulieren. Also:
-- Programm mit `node infoscreen.js` starten
-- Auf Chrome warten
-- Konsole in front bringen
-- TV umschalten und/oder ausschalten
-- "K" auf der Tastatur drücken
-- Kann bis zu 15 Sekunden dauern, dann sollte der TV an und Infoscreen drauf sein.
+Wird, während der Browser offen ist, auf __e__ gedrückt, wird ein Einsatz simuliert.
 
-Achtung: Mit eingeschaltenen Parameter kann pm2 o.ä. nicht arbeiten.
+Also:
+- Programm mit z.B. `node infoscreen.js` starten
+- Auf Chrome warten
+- TV umschalten und/oder ausschalten
+- "e" auf der Tastatur drücken
+- Kann bis zu 15 Sekunden dauern, dann sollte der TV an und Infoscreen drauf sein.
 
 ## Install Guide (RPI, Linux)
 Install DietPi https://dietpi.com/. In den optimierten Softwarepaketen LXDE und Chromium auswählen. Bei den normalen NodeJS.
