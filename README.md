@@ -1,8 +1,8 @@
 # Auto-InfoScreen
-Node.js App für den FF Infoscreen mit TV-Einschalt Funktion.
+FF Infoscreen mit TV-Einschalt Funktion (Node.js App).
 
 ## Was
-Diese App startet einen Chrome-Browser und navigiert zu der bekannten FF InfoScreen-Seite (infoscreen.florian10.info). Danach check Sie alle __5 Sekunden__, ob ein Einsatz aktiv ist. Wird erkannt, dass ein Einsatz reingekommen ist, sendet die App ein Command zum Fernseher dass sich dieser einschaltet und den Screen anzeigt.
+Diese App startet einen Chrome-Browser und navigiert zu der bekannten FF InfoScreen-Seite (infoscreen.florian10.info). Danach check Sie alle __5 Sekunden__, ob ein Einsatz aktiv ist. Wird erkannt, dass ein Einsatz reingekommen ist, sendet die App ein Command zum Fernseher, sodass sich dieser einschaltet und den Screen anzeigt.
 
 Besonders für Feuerwehrhäuser geeignet, welche nicht die ganze Zeit den Bildschirm/TV eingeschaltet haben wollen.
 
