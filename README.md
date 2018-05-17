@@ -47,4 +47,8 @@ Und eine clean_chrome-Datei anlegen (in /bin) mit:
 
 __ACHTUNG__: Dann gibts kein Panel und keinen Desktop mehr, die Befehle dafür würden in `/etc/xdg/lxsession/<profile>/autostart` stehen, werden aber durch die lokale Autostart nicht mehr ausgeführt.
 
-
+Screensave ausschalten mit inhalt in `~/.xsessionrc`:  
+```
+xset s off
+xset -dpms
+```
