@@ -15,11 +15,13 @@ chromeLauncher.launch({
 
     CDP({port: chrome.port}, async (client) => {
         chromeClient = client;
-	const {Runtime} = chromeClient;
-        //Add Debug Key
-        await Runtime.evaluate({
-            expression: '$(document).keypress(function(e){if(e.keyCode===101){Infoscreen.Manager.cycle._onSuccess({"CurrentState":"data","EinsatzData":[{"EinsatzID":"KS 0815","Status":2,"Alarmstufe":"T1","Meldebild":"Fahrzeugbergung","Nummer1":"15","Plz":"3500","Strasse":"Kremstalstraße","Ort":"Krems","Abschnitt":"BasisAbschnitt","Bemerkung":"","EinsatzErzeugt":"2018-05-07T14:23:39.0215599+02:00","Melder":"Franz Müller","MelderTelefon":"06641234567","EinsatzNummer":1,"Dispositionen":[{"Name":"KS-Krems Hauptwache Schleife 3","IsEigenalarmiert":true,"DispoTime":"2012-05-10T08:55:00","AusTime":"2012-05-10T08:58:00","EinTime":"2012-05-10T09:30:00","IsBackground":false}],"Rsvp":{"Yes":14,"No":4}}]},"")}});'
-        });
+	//Add Debug Key
+	setTimeout(function(){
+		const {Runtime} = chromeClient;
+	        Runtime.evaluate({
+	            expression: '$(document).keypress(function(e){if(e.keyCode===101){Infoscreen.Manager.cycle._onSuccess({"CurrentState":"data","EinsatzData":[{"EinsatzID":"KS 0815","Status":2,"Alarmstufe":"T1","Meldebild":"Fahrzeugbergung","Nummer1":"15","Plz":"3500","Strasse":"Kremstalstraße","Ort":"Krems","Abschnitt":"BasisAbschnitt","Bemerkung":"","EinsatzErzeugt":"2018-05-07T14:23:39.0215599+02:00","Melder":"Franz Müller","MelderTelefon":"06641234567","EinsatzNummer":1,"Dispositionen":[{"Name":"KS-Krems Hauptwache Schleife 3","IsEigenalarmiert":true,"DispoTime":"2012-05-10T08:55:00","AusTime":"2012-05-10T08:58:00","EinTime":"2012-05-10T09:30:00","IsBackground":false}],"Rsvp":{"Yes":14,"No":4}}]},"")}});'
+	        });
+	},5000);
         setInterval(callAndExtract,5000);
         console.log("chrome and Debug initiated");
     }).on('error', (err) => {
@@ -45,7 +47,6 @@ async function callAndExtract()
                 //use cec!
                 try{
                     if(cec != null ) {
-			cec.send("on 0");
 			cec.send("as");
                         console.log(`CEC ActiveSource sent`);
                     }
@@ -77,11 +78,11 @@ try{
     nodecec = require( 'node-cec' );
     NodeCec = nodecec.NodeCec;
     CEC     = nodecec.CEC;
-    cec = new NodeCec( 'node-cec-monitor' );
+    cec = new NodeCec( 'InfoScreen' );
 
     console.log("cec init success");
     try{
-        cec.start( 'cec-client', '-b', 'r', '-o', 'FF Infoscreen');
+        cec.start( 'cec-client', '-b', 'r');
     }catch (e) {
         console.log("cec not started");
     }
