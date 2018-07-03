@@ -54,8 +54,11 @@ async function callAndExtract()
                 try{
                     if(cec != null ) {
 			//cec.send("as");
-			cec.send("on");
-			cec.sendCommand(0x1F,0x82,0x10,00);
+			cec.send("on 0");
+			setTimeout(function(){
+				cec.sendCommand(0x1F,0x82,0x10,00);
+				console.log(`CEC act sent`);
+			},2000);
                         console.log(`CEC ActiveSource sent`);
                     }
                 }catch (e) {
