@@ -41,7 +41,7 @@ async function callAndExtract()
     const {Network, Page, Runtime} = chromeClient;
     try {
         const result = await Runtime.evaluate({
-            expression: '$("div.einsatz.aktiv").length > 0'
+            expression: '$("div.einsatz").length > 0'
         });
         console.log("checked");
         if(result.result.value){
