@@ -35,17 +35,25 @@ Browser mit Token sollte sich öffnen. Token im Infoscreen-Admin eintragen, Node
 Für automatisches Starten *pm2* verwenden: `npm install -g pm2`. Danach `pm2 startup`, `pm2 start infoscreen.js` und `pm2 save` (siehe http://pm2.keymetrics.io/docs/usage/quick-start/).
 
 ### Workarounds
-Im Startup-Script von LXDE (~/.config/lxsession/LXDE/autostart) folgendes angeben:
+Im Startup-Script von LXDE folgendes angeben:
 
-``@xdotool mousemove 9000 9000``  
-``@clean_chrome``
+```
+root@DietPi:~# cat /etc/xdg/lxsession/LXDE/autostart
+@lxpanel --profile LXDE
+@pcmanfm --desktop --profile LXDE
+@xscreensaver -no-splash
+
+@clean_chrome
+@xdotool mousemove 9000 9000
+@pm2 start /root/tmp/Auto-InfoScreen/infoscreen.js &
+@pm2 start /root/tmp/NodePinger/nodepinger.js &
+
+```
 
 Und eine clean_chrome-Datei anlegen (in /bin) mit:  
 `#!/bin/bash`  
 `sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/'Local State'`  
 `sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferences`
-
-__ACHTUNG__: Dann gibts kein Panel und keinen Desktop mehr, die Befehle dafür würden in `/etc/xdg/lxsession/<profile>/autostart` stehen, werden aber durch die lokale Autostart nicht mehr ausgeführt.
 
 Screensave ausschalten mit inhalt in `~/.xsessionrc`:  
 ```
